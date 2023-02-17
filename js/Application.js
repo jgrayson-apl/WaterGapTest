@@ -175,21 +175,24 @@ class Application extends AppBase {
 
       const hydroBasinsLevel7Layer = view.map.layers.find(layer => layer.title === 'Hydrobasins Level 7');
       const hydroBasinsLevel7Stats = new FeatureLayerStats({
-        container: 'huc-test-panel', view,
+        container: 'huc-test-panel',
+        view,
         featureLayer: hydroBasinsLevel7Layer,
         ...defaultRenderingOptions
       });
 
       const hydroBasinsLevel5Layer = view.map.layers.find(layer => layer.title === 'Hydrobasins Level 5');
       const hydroBasinsLevel5Stats = new FeatureLayerStats({
-        container: 'huc-test-panel', view,
+        container: 'huc-test-panel',
+        view,
         featureLayer: hydroBasinsLevel5Layer,
         ...defaultRenderingOptions
       });
 
       const waterProvincesLayer = view.map.layers.find(layer => layer.title === 'Water Provinces');
       const waterProvincesStats = new FeatureLayerStats({
-        container: 'huc-test-panel', view,
+        container: 'huc-test-panel',
+        view,
         featureLayer: waterProvincesLayer,
         ...defaultRenderingOptions
       });

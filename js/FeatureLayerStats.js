@@ -86,6 +86,9 @@ class FeatureLayerStats extends HTMLElement {
     this.updateStatsRenderer();
   }
 
+  /**
+   * CURRENTLY NOT USED
+   */
   #variableInfos = [
     ['domestic_demand', {min: 0.01, max: 1.0}],
     ['industry_demand', {min: 0.05, max: 1.0}],
@@ -140,8 +143,7 @@ class FeatureLayerStats extends HTMLElement {
 
     this.#enabled = true;
 
-    // COUNT FORMATTER //
-    this.countFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    // VALUE FORMATTER //
     this.valueFormatter = new Intl.NumberFormat('default', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
     const shadowRoot = this.attachShadow({mode: 'open'});
@@ -151,24 +153,9 @@ class FeatureLayerStats extends HTMLElement {
         :host .sum-label{
           font-size: 13pt;
           font-weight: 600;
-        }    
-        :host calcite-icon[icon="check-circle"]{
-          --calcite-ui-icon-color: darkgreen;        
-        }
-        :host calcite-icon[icon="exclamation-mark-triangle"]{
-          --calcite-ui-icon-color: crimson;        
         }
       </style>
-      <calcite-block heading="${ this.#featureLayer.title || "Feature Layer Statistics" }" description="all features within the current view" collapsible open>
-        <calcite-block-section class="status-section" text="Status" status="idle" hidden>
-          <calcite-label layout="inline">          
-            <calcite-icon class="visible-icon" icon="check-circle" scale="s"></calcite-icon>          
-            <span>Visible</span>          
-            <calcite-icon class="suspended-icon" icon="check-circle" scale="s"></calcite-icon>
-            <span>Suspended</span>                    
-          </calcite-label>
-        </calcite-block-section>
-        <br>
+      <calcite-block heading="${ this.#featureLayer.title || "Feature Layer Statistics" }" description="all features within the current view" collapsible open>                
         <calcite-label layout="inline-space-between">
           <span>sum of <span class="field-name-label"></span></span><span class="sum-label">---</span>
         </calcite-label>                        
@@ -183,13 +170,11 @@ class FeatureLayerStats extends HTMLElement {
    */
   connectedCallback() {
 
-    this.visibleIcon = this.shadowRoot.querySelector('.visible-icon');
-    this.suspendedIcon = this.shadowRoot.querySelector('.suspended-icon');
-    this.statusSection = this.shadowRoot.querySelector('.status-section');
     this.sumLabel = this.shadowRoot.querySelector('.sum-label');
     this.fieldNameLabel = this.shadowRoot.querySelector('.field-name-label');
 
     this.#featureLayer.load().then(() => {
+      // CONFIGURE THE DESIRED FIELDS TO BE LOADED BY DEFAULT //
       this.#featureLayer.set({outFields: this.#statisticsFieldNames});
       this._initialize();
     });
@@ -214,18 +199,11 @@ class FeatureLayerStats extends HTMLElement {
 
       const _handleAbortErrors = error => { !promiseUtils.isAbortError(error) && console.error(error); };
 
-      // LAYER VISIBLE //
-      reactiveUtils.watch(() => this.#featureLayer.visible, visible => {
-        this.visibleIcon.setAttribute('icon', visible ? 'check-circle' : 'exclamation-mark-triangle');
-      }, {initial: true});
-
       // LAYERVIEW //
       this.#view.whenLayerView(this.#featureLayer).then(layerView => {
 
         // SUSPENDED //
         reactiveUtils.watch(() => layerView.suspended, suspended => {
-          this.statusSection.setAttribute('status', suspended ? 'invalid' : 'valid');
-          this.suspendedIcon.setAttribute('icon', suspended ? 'exclamation-mark-triangle' : 'check-circle');
           suspended && this.clearLabels();
         }, {initial: true});
 
