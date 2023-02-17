@@ -1,0 +1,121 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+.calcite-mode-light,
+.calcite-mode-dark {
+  --calcite-ui-brand: #00619b;
+  --calcite-ui-brand-hover: #00304d;
+  --calcite-ui-brand-press: #77bde7;
+  --calcite-ui-icon-color: #00619b;
+}
+
+.esri-widget,
+.esri-widget__heading,
+.esri-menu,
+.esri-popup__main-container,
+.esri-popup__header-container--button:hover,
+.esri-popup__pointer-direction {
+  color: var(--calcite-ui-text-2) !important;
+  background-color: var(--calcite-ui-foreground-1) !important;
+}
+
+.esri-button,
+.esri-popup__button,
+.esri-widget--button {
+  color: var(--calcite-ui-icon-color) !important;
+  background-color: var(--calcite-ui-foreground-1) !important;
+}
+
+header[slot="header"] {
+  padding: 0 0.5rem 0 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--calcite-ui-brand);
+}
+
+header calcite-action-bar {
+  align-items: center;
+}
+
+.application-title {
+  color: var(--calcite-ui-brand);
+}
+
+.application-icon {
+  margin-right: 0.5rem;
+}
+
+calcite-loader#app-loader {
+  --calcite-loader-size: 8rem;
+  align-self: center;
+  justify-self: center;
+}
+
+
+calcite-modal {
+  --calcite-modal-content-background: var(--calcite-ui-background);
+}
+
+calcite-modal [slot="secondary"] calcite-label {
+  --calcite-label-margin-bottom: 0;
+}
+
+.content-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.content-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+}
+
+.content-static {
+  flex-grow: 0;
+  flex-shrink: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+.content-fill {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+#center-container {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#view-container {
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}

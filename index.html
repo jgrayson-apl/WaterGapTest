@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0 maximum-scale=1.0"/>
+    <!-- ICON -->
+    <link rel="icon" href="./assets/favicon.ico" sizes="32x32" type="image/vnd.microsoft.icon">
+    <!-- TITLE -->
+    <title class="application-title"></title>
+    <!-- META -->
+    <!--<meta property="og:title" content="">-->
+    <!--<meta property="og:description" content="">-->
+    <!--<meta property="og:url" content="https://geoxc-apps.bd.esri.com/.../index.html">-->
+    <!--<meta property="og:image" content="https://geoxc-apps.bd.esri.com/.../assets/app.png">-->
+    
+    <!-- CHARTJS -- https://www.chartjs.org/ -->
+    <!-- 3.9.1 -->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>-->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.1.0/dist/chartjs-plugin-datalabels.min.js"></script>-->
+    <!--https://github.com/chartjs/chartjs-plugin-datalabels-->
+    <!-- 4.1.2 -->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@4.1.2/dist/chart.min.js"></script>-->
+    
+    <!-- CALCITE -->
+    <script type="module" src="https://js.arcgis.com/calcite-components/1.0.3/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/1.0.3/calcite.css"/>
+    
+    <!-- ArcGIS API for JavaScript-->
+    <link href="https://js.arcgis.com/4.25/@arcgis/core/assets/esri/themes/light/main.css" rel="stylesheet"/>
+    <script src="https://js.arcgis.com/4.25/"></script>
+    
+    <!-- APPLICATION -->
+    <link rel="stylesheet" type="text/css" href="./css/application.css">
+    <script type="module" src="./js/Application.js"></script>
+  </head>
+  <body class="calcite-mode-light">
+    <calcite-shell>
+      
+      <header class="content-row" slot="header">
+        <h2 class="content-row">
+          <calcite-icon class="application-icon" icon="add-in" scale="l"></calcite-icon>
+          <span class="application-title"></span>
+        </h2>
+        <calcite-action-bar layout="horizontal" expand-disabled="true">
+          <div id="sign-in-container"></div>
+          <calcite-action id="app-share-action" appearance="transparent" scale="m" title="share current options..." text="share current options" icon="link"></calcite-action>
+          <calcite-action id="app-details-action" appearance="transparent" scale="m" title="app details..." text="app details" icon="information"></calcite-action>
+        </calcite-action-bar>
+      </header>
+      
+      <!-- LEFT -->
+      <calcite-shell-panel slot="panel-start" position="start" width-scale="m" collapsed="false">
+        <calcite-action-bar id="side-panel-action-bar" slot="action-bar">
+          <calcite-action text="Layers" title="map" icon="map" class="toggle-action" data-toggle="map"></calcite-action>
+          <calcite-action text="Statistics" title="layer stats" icon="dashboard" class="toggle-action" data-toggle="huc" active></calcite-action>
+        </calcite-action-bar>
+        
+        <calcite-panel heading="Map" class="toggle-panel" data-toggle="map" hidden>
+          <div id="map-details" class="pane"></div>
+          <calcite-block heading="Layers" collapsible open>
+            <calcite-icon slot="icon" icon="layers"></calcite-icon>
+            <div id="layer-list-container"></div>
+          </calcite-block>
+          <calcite-block heading="Legend" collapsible>
+            <calcite-icon slot="icon" icon="legend"></calcite-icon>
+            <div id="legend-container"></div>
+          </calcite-block>
+        </calcite-panel>
+        
+        <calcite-panel id="huc-test-panel" heading="Water Gap Layers" class="toggle-panel" data-toggle="huc">
+          <calcite-block heading="Options" collapsible open>
+            <calcite-label>
+              <div>Year</div>
+              <calcite-slider id="year-slider" group-separator label-handles label-ticks min="1980" value="1980" max="2019" min-label="1980" max-label="2019" ticks="10" page-step="5" precise snap></calcite-slider>
+            </calcite-label>
+            <calcite-label>
+              <div>Variable</div>
+              <calcite-combobox id="variables-list" placeholder="Select a variable" selection-mode="single">
+                <calcite-combobox-item value="domestic" text-label="Domestic"></calcite-combobox-item>
+                <calcite-combobox-item value="industry" text-label="Industry"></calcite-combobox-item>
+                <calcite-combobox-item value="irrigation" text-label="Irrigation"></calcite-combobox-item>
+                <calcite-combobox-item value="livestock" text-label="Livestock"></calcite-combobox-item>
+                <calcite-combobox-item value="total" text-label="Total" selected></calcite-combobox-item>
+              </calcite-combobox>
+            </calcite-label>
+            <calcite-label>
+              <div>Type</div>
+              <calcite-segmented-control id="stat-type-option" width="full">
+                <calcite-segmented-control-item value="gap" checked>Gap</calcite-segmented-control-item>
+                <calcite-segmented-control-item value="demand">Demand</calcite-segmented-control-item>
+              </calcite-segmented-control>
+            </calcite-label>
+          </calcite-block>
+        </calcite-panel>
+      
+      </calcite-shell-panel>
+      
+      <!-- CENTER -->
+      <div id="center-container" class="content-col content-fill">
+        <div id="view-container"></div>
+      </div>
+      
+      <!-- SHAREABLE ALERT -->
+      <calcite-alert id="app-share-alert" slot="alerts" kind="success" icon="launch" placement="bottom" auto-close auto-close-duration="medium">
+        <div slot="message">Shareable link has been copied to the clipboard.</div>
+        <calcite-link slot="link" href="#" target="_blank" role="link" title="open in new tab">open in new tab</calcite-link>
+      </calcite-alert>
+      
+      <!-- NOTICES ADN ALERTS -->
+      <calcite-alert id="app-notice" slot="alerts" kind="danger" placement="bottom" width="auto">
+        <div slot="title"></div>
+        <div slot="message"></div>
+      </calcite-alert>
+      
+      <!-- APP DETAILS MODAL -->
+      <calcite-modal id="app-details-modal" slot="modals" kind="brand" scale="m" width="m" aria-labelledby="app-modal-title">
+        <h3 slot="header" id="app-modal-title" class="application-title"></h3>
+        <div slot="content" class="application-description"></div>
+        <div slot="secondary">
+          <calcite-label layout="inline">
+            <span>hide on startup</span>
+            <calcite-checkbox id="hide-startup-checkbox"></calcite-checkbox>
+          </calcite-label>
+        </div>
+        <calcite-button id="app-details-ok-btn" slot="primary" width="full" hidden>OK</calcite-button>
+      </calcite-modal>
+    
+    </calcite-shell>
+    
+    <!-- LOADER -->
+    <calcite-loader id="app-loader" type="indeterminate" scale="l" text="...loading..."></calcite-loader>
+  
+  </body>
+</html>
