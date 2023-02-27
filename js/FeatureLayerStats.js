@@ -209,6 +209,7 @@ class FeatureLayerStats extends HTMLElement {
         maxScale: this.#maxScale,
         outFields: this.#statisticsFieldNames
       });
+
       this._initialize();
     });
 
@@ -271,6 +272,7 @@ class FeatureLayerStats extends HTMLElement {
 
                 this.sumLabel.innerHTML = this.valueFormatter.format(stats.sum);
 
+                // UPDATE RENDERER //
                 this._updateRenderer();
 
                 resolve();
@@ -279,6 +281,11 @@ class FeatureLayerStats extends HTMLElement {
           });
         };
 
+        /**
+         * UPDATE RENDERER
+         *
+         * @private
+         */
         this._updateRenderer = () => {
 
           /*const colorVV = this.#featureLayer.renderer.visualVariables.find(vv => vv.type === 'color');
@@ -306,6 +313,24 @@ class FeatureLayerStats extends HTMLElement {
            }
            }
            ];*/
+
+          /*stops: [
+           {
+           label: `+half stdev - ${ stopValues.avgPlus.toFixed(6) }`,
+           value: stopValues.avgPlus,
+           color: [0, 110, 255]
+           },
+           {
+           label: `average - ${ stopValues.average.toFixed(6) }`,
+           value: stopValues.average,
+           color: [191, 233, 255]
+           },
+           {
+           label: `-half stdev - ${ stopValues.avgMinus.toFixed(6) }`,
+           value: stopValues.avgMinus,
+           color: [0, 110, 255]
+           }
+           ]*/
 
           /*const stopValues = {
            avgMinus: stats.avg - (stats.stddev * 0.5),
@@ -350,23 +375,6 @@ class FeatureLayerStats extends HTMLElement {
                     color: this.colorRampByVariable[this.#variable][1]
                   }
                 ]
-                /*stops: [
-                 {
-                 label: `+half stdev - ${ stopValues.avgPlus.toFixed(6) }`,
-                 value: stopValues.avgPlus,
-                 color: [0, 110, 255]
-                 },
-                 {
-                 label: `average - ${ stopValues.average.toFixed(6) }`,
-                 value: stopValues.average,
-                 color: [191, 233, 255]
-                 },
-                 {
-                 label: `-half stdev - ${ stopValues.avgMinus.toFixed(6) }`,
-                 value: stopValues.avgMinus,
-                 color: [0, 110, 255]
-                 }
-                 ]*/
               },
               {
                 type: 'opacity',
@@ -408,6 +416,7 @@ class FeatureLayerStats extends HTMLElement {
           this.updateStatsRenderer();
         }, {initial: true});
 
+        // INITIAL UPDATE //
         this._updateRenderer();
 
       });
