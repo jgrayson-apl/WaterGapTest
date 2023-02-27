@@ -380,8 +380,8 @@ class FeatureLayerStats extends HTMLElement {
                 type: 'opacity',
                 valueExpression: this.valueExpression,
                 stops: [
-                  {value: min, opacity: 0.75},
-                  {value: max, opacity: 0.90}
+                  {value: min, opacity: 0.70},
+                  {value: max, opacity: 0.95}
                 ],
                 legendOptions: {
                   showLegend: false
