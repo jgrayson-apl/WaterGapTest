@@ -174,7 +174,7 @@ class FeatureLayerStats extends HTMLElement {
       <style>
         :host {}
         :host .sum-label{
-          font-size: 13pt;
+          font-size: 17pt;
           font-weight: 600;
         }
       </style>

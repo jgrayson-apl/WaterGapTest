@@ -173,13 +173,13 @@ class Application extends AppBase {
         defaultStatType: statTypeOption.value // 'gap'
       };
 
-      const hydroBasinsLevel7Layer = view.map.layers.find(layer => layer.title === 'Hydrobasins Level 7');
-      const hydroBasinsLevel7Stats = new FeatureLayerStats({
+      const waterProvincesLayer = view.map.layers.find(layer => layer.title === 'Water Provinces');
+      const waterProvincesStats = new FeatureLayerStats({
         container: 'huc-test-panel',
         view,
-        featureLayer: hydroBasinsLevel7Layer,
-        minScale: 5000000,
-        maxScale: 0,
+        featureLayer: waterProvincesLayer,
+        minScale: 0,
+        maxScale: 20000000,
         ...defaultRenderingOptions
       });
 
@@ -193,17 +193,17 @@ class Application extends AppBase {
         ...defaultRenderingOptions
       });
 
-      const waterProvincesLayer = view.map.layers.find(layer => layer.title === 'Water Provinces');
-      const waterProvincesStats = new FeatureLayerStats({
+      const hydroBasinsLevel7Layer = view.map.layers.find(layer => layer.title === 'Hydrobasins Level 7');
+      const hydroBasinsLevel7Stats = new FeatureLayerStats({
         container: 'huc-test-panel',
         view,
-        featureLayer: waterProvincesLayer,
-        minScale: 0,
-        maxScale: 20000000,
+        featureLayer: hydroBasinsLevel7Layer,
+        minScale: 5000000,
+        maxScale: 0,
         ...defaultRenderingOptions
       });
 
-      const allLayerStats = [hydroBasinsLevel7Stats, hydroBasinsLevel5Stats, waterProvincesStats];
+      const allLayerStats = [waterProvincesStats, hydroBasinsLevel5Stats, hydroBasinsLevel7Stats];
 
       variablesList.addEventListener('calciteComboboxChange', () => {
         allLayerStats.forEach(layerStats => {
@@ -235,13 +235,15 @@ class Application extends AppBase {
           abortController?.abort();
           abortController = new AbortController();
           view.popup.fetchFeatures(view.toScreen(view.center), {signal: abortController.signal}).then((response) => {
-            response.allGraphicsPromise.then((graphics) => {
-              if (graphics?.length) {
-                view.popup.open({features: graphics});
-              } else {
-                view.popup.close();
-              }
-            });
+            if(!abortController.signal.aborted) {
+              response.allGraphicsPromise.then((graphics) => {
+                if (graphics?.length) {
+                  view.popup.open({features: graphics});
+                } else {
+                  view.popup.close();
+                }
+              });
+            }
           }).catch(_handleAbortErrors);
         }, {initial: true});
       }, {initial: true});
