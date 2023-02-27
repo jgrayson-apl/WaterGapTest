@@ -394,7 +394,7 @@ class FeatureLayerStats extends HTMLElement {
             renderer: waterGapRenderer,
             popupTemplate: {
               title: this.valueExpressionTitle,
-              content: '<b>{expression/water_gap}</b> mm/m3',
+              content: '<b>{expression/water_gap}</b> m/m<sup>2</sup>',
               expressionInfos: [{
                 name: "water_gap",
                 expression: this.valueExpression
