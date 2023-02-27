@@ -169,8 +169,8 @@ class Application extends AppBase {
       const statTypeOption = document.getElementById('stat-type-option');
 
       const defaultRenderingOptions = {
-        variable: variablesList.value, //'total',
-        statType: statTypeOption.value // 'gap'
+        defaultVariable: variablesList.value, //'total',
+        defaultStatType: statTypeOption.value // 'gap'
       };
 
       const hydroBasinsLevel7Layer = view.map.layers.find(layer => layer.title === 'Hydrobasins Level 7');
@@ -178,6 +178,8 @@ class Application extends AppBase {
         container: 'huc-test-panel',
         view,
         featureLayer: hydroBasinsLevel7Layer,
+        minScale: 5000000,
+        maxScale: 0,
         ...defaultRenderingOptions
       });
 
@@ -186,6 +188,8 @@ class Application extends AppBase {
         container: 'huc-test-panel',
         view,
         featureLayer: hydroBasinsLevel5Layer,
+        minScale: 20000000,
+        maxScale: 5000000,
         ...defaultRenderingOptions
       });
 
@@ -194,6 +198,8 @@ class Application extends AppBase {
         container: 'huc-test-panel',
         view,
         featureLayer: waterProvincesLayer,
+        minScale: 0,
+        maxScale: 20000000,
         ...defaultRenderingOptions
       });
 

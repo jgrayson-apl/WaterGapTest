@@ -49,18 +49,54 @@ class FeatureLayerStats extends HTMLElement {
    */
   #featureLayer;
 
+  #minScale;
+
+  #maxScale;
+
   #statisticsFieldNames = [
     'domestic_demand',
-    'industry_demand',
-    'irrigation_demand',
-    'livestock_demand',
-    'total_demand',
     'domestic_gap',
+    'industry_demand',
     'industry_gap',
-    'irrigation_gap',
+    'livestock_demand',
     'livestock_gap',
+    'irrigation_demand',
+    'irrigation_gap',
+    'total_demand',
     'total_gap'
   ];
+
+  /**
+   *
+   */
+  #variableInfos = {
+    'domestic_demand': {min: 0.01, max: 180.0, precision: 2},
+    'domestic_gap': {min: 0.0001, max: 16.0, precision: 4},
+    'industry_demand': {min: 0.05, max: 520.0, precision: 2},
+    'industry_gap': {min: 0.0001, max: 60.0, precision: 4},
+    'irrigation_demand': {min: 0.05, max: 1900.0, precision: 2},
+    'irrigation_gap': {min: 0.0001, max: 240.0, precision: 4},
+    'livestock_demand': {min: 0.001, max: 9200.0, precision: 3},
+    'livestock_gap': {min: 0.0001, max: 1400.0, precision: 4},
+    'total_demand': {min: 0.05, max: 1920.0, precision: 2},
+    'total_gap': {min: 0.05, max: 250.0, precision: 3}
+  };
+
+  colorRampByVariable = {
+    'total': ['#1f2638', '#2160ff'],
+    'domestic': ['#20333a', '#21daff'],
+    'irrigation': ['#2f3926', '#72c70c'],
+    'livestock': ['#383726', '#c7b70e'],
+    'industry': ['#322531', '#c25dbd']
+  };
+
+  colorsByVariable = {
+    'domestic': ['#20333a', '#20525e', '#207284', '#2193ac', '#21b6d5', '#21daff'],
+    'industry': ['#322531', '#4d304c', '#693b67', '#864683', '#a451a0', '#c25dbd'],
+    'irrigation': ['#2f3926', '#3c5421', '#486f1c', '#568b17', '#64a912', '#72c70c'],
+    'livestock': ['#383726', '#524e21', '#6e671d', '#8a8017', '#a89c13', '#c7b70e'],
+    'total': ['#1f2638', '#20315c', '#213c82', '#2249ab', '#2254d4', '#2160ff']
+  };
 
   #onStatisticField;
 
@@ -86,22 +122,6 @@ class FeatureLayerStats extends HTMLElement {
     this.updateStatsRenderer();
   }
 
-  /**
-   * CURRENTLY NOT USED
-   */
-  #variableInfos = [
-    ['domestic_demand', {min: 0.01, max: 1.0}],
-    ['industry_demand', {min: 0.05, max: 1.0}],
-    ['irrigation_demand', {min: 0.05, max: 1.0}],
-    ['livestock_demand', {min: 0.001, max: 1.0}],
-    ['total_demand', {min: 0.05, max: 1.0}],
-    ['domestic_gap', {min: 0.0001, max: 1.0}],
-    ['industry_gap', {min: 0.0001, max: 1.0}],
-    ['irrigation_gap', {min: 0.0001, max: 1.0}],
-    ['livestock_gap', {min: 0.0001, max: 1.0}],
-    ['total_gap', {min: 0.05, max: 1.0}]
-  ];
-
   #yearMin;
   #yearOffset;
   #year;
@@ -112,19 +132,19 @@ class FeatureLayerStats extends HTMLElement {
     this.updateStatsRenderer();
   }
 
-  get valueExpression() {
-    return `Number(Split($feature.${ this.#onStatisticField },'|')[${ this.#yearOffset }])`;
-  }
-
   get valueExpressionTitle() {
     //const fieldLabel = this.#featureLayer.getField(this.#onStatisticField).alias;
     return `${ this.#variable } water ${ this.#statType } in ${ this.#yearMin + this.#yearOffset }`;
   }
 
+  get valueExpression() {
+    return `Number(Split($feature.${ this.#onStatisticField },'|')[${ this.#yearOffset }])`;
+  }
+
   /**
    *
    */
-  constructor({container, view, featureLayer, statType, variable}) {
+  constructor({container, view, featureLayer, defaultVariable, defaultStatType, minScale, maxScale}) {
     super();
 
     // CONTAINER //
@@ -135,8 +155,11 @@ class FeatureLayerStats extends HTMLElement {
     // FEATURE LAYER //
     this.#featureLayer = featureLayer;
 
-    this.#statType = statType;
-    this.#variable = variable;
+    this.#minScale = minScale;
+    this.#maxScale = maxScale;
+
+    this.#statType = defaultStatType;
+    this.#variable = defaultVariable;
 
     this.#yearMin = this.#year = 1980;
     this.#yearOffset = 0;
@@ -174,8 +197,18 @@ class FeatureLayerStats extends HTMLElement {
     this.fieldNameLabel = this.shadowRoot.querySelector('.field-name-label');
 
     this.#featureLayer.load().then(() => {
-      // CONFIGURE THE DESIRED FIELDS TO BE LOADED BY DEFAULT //
-      this.#featureLayer.set({outFields: this.#statisticsFieldNames});
+
+      /**
+       * TODO: CONFIGURE ALL OTHER LAYER SETTINGS HERE
+       *       - MIN/MAX SCALE
+       *       - FIELDS: CONFIGURE THE DESIRED FIELDS TO BE LOADED BY DEFAULT
+       */
+
+      this.#featureLayer.set({
+        minScale: this.#minScale,
+        maxScale: this.#maxScale,
+        outFields: this.#statisticsFieldNames
+      });
       this._initialize();
     });
 
@@ -238,51 +271,86 @@ class FeatureLayerStats extends HTMLElement {
 
                 this.sumLabel.innerHTML = this.valueFormatter.format(stats.sum);
 
-                const colorVV = this.#featureLayer.renderer.visualVariables.find(vv => vv.type === 'color');
-                colorVV.set({
-                  valueExpressionTitle: this.valueExpressionTitle,
-                  valueExpression: this.valueExpression,
-                  legendOptions: {
-                    title: this.valueExpressionTitle
-                  }/*,
-                   stops: colorVV.stops.map((colorStop, colorStopIdx) => {
-                   const stopValue = (stats.min + ((stats.max - stats.min) * (colorStopIdx / colorVV.stops.length)));
-                   colorStop.value = stopValue;
-                   (colorStopIdx % 2 === 0) && (colorStop.label = stopValue.toFixed(2));
-                   return colorStop;
-                   })*/
-                });
+                this._updateRenderer(stats);
 
-                /*const stopValues = {
-                 avgMinus: stats.avg - (stats.stddev * 0.5),
-                 average: stats.avg,
-                 avgPlus: stats.avg + (stats.stddev * 0.5)
-                 };
+                resolve();
+              }
+            }).catch(reject);
+          });
+        };
 
-                 this.#featureLayer.renderer = {
-                 type: 'simple',
-                 symbol: {
-                 type: 'simple-fill',
-                 color: 'rgba(255,255, 255,0.5)',
-                 outline: {
-                 width: 0.2,
-                 color: 'rgba(255,255, 255,1.0)'
-                 }
-                 },
-                 defaultSymbol: {
-                 type: 'simple-fill',
-                 color: 'rgba(127,127, 127,0.5)',
-                 outline: {
-                 width: 0.5,
-                 color: 'rgba(127,127, 127,0.9)'
-                 }
-                 },
-                 visualVariables: [
-                 {
-                 type: 'color',
-                 valueExpressionTitle: this.valueExpressionTitle,
-                 valueExpression: this.valueExpression,
-                 stops: [
+        this._updateRenderer = () => {
+
+          /*const colorVV = this.#featureLayer.renderer.visualVariables.find(vv => vv.type === 'color');
+           colorVV.set({
+           valueExpressionTitle: this.valueExpressionTitle,
+           valueExpression: this.valueExpression,
+           legendOptions: {
+           title: this.valueExpressionTitle
+           }/!*,
+           stops: colorVV.stops.map((colorStop, colorStopIdx) => {
+           const stopValue = (stats.min + ((stats.max - stats.min) * (colorStopIdx / colorVV.stops.length)));
+           colorStop.value = stopValue;
+           (colorStopIdx % 2 === 0) && (colorStop.label = stopValue.toFixed(2));
+           return colorStop;
+           })*!/
+           });*/
+
+          /*this.#featureLayer.renderer.visualVariables = [
+           {
+           type: 'color',
+           valueExpressionTitle: this.valueExpressionTitle,
+           valueExpression: this.valueExpression,
+           legendOptions: {
+           title: this.valueExpressionTitle
+           }
+           }
+           ];*/
+
+          /*const stopValues = {
+           avgMinus: stats.avg - (stats.stddev * 0.5),
+           average: stats.avg,
+           avgPlus: stats.avg + (stats.stddev * 0.5)
+           };*/
+
+          const {min, max, precision} = this.#variableInfos[this.#onStatisticField];
+
+          const waterGapRenderer = {
+            type: 'simple',
+            symbol: {
+              type: 'simple-fill',
+              color: 'rgba(255,255, 255,0.5)',
+              outline: {
+                width: 0.2,
+                color: this.colorRampByVariable[this.#variable][0]
+              }
+            },
+            defaultSymbol: {
+              type: 'simple-fill',
+              color: 'rgba(127,127, 127,0.5)',
+              outline: {
+                width: 0.5,
+                color: 'rgba(127,127, 127,0.9)'
+              }
+            },
+            visualVariables: [
+              {
+                type: 'color',
+                valueExpressionTitle: this.valueExpressionTitle,
+                valueExpression: this.valueExpression,
+                stops: [
+                  {
+                    label: `${ min.toFixed(precision) }`,
+                    value: min,
+                    color: this.colorRampByVariable[this.#variable][0]
+                  },
+                  {
+                    label: `${ max.toFixed(precision) }`,
+                    value: max,
+                    color: this.colorRampByVariable[this.#variable][1]
+                  }
+                ]
+                /*stops: [
                  {
                  label: `+half stdev - ${ stopValues.avgPlus.toFixed(6) }`,
                  value: stopValues.avgPlus,
@@ -298,15 +366,34 @@ class FeatureLayerStats extends HTMLElement {
                  value: stopValues.avgMinus,
                  color: [0, 110, 255]
                  }
-                 ]
-                 }
-                 ]
-                 };*/
-
-                resolve();
+                 ]*/
+              },
+              {
+                type: 'opacity',
+                valueExpression: this.valueExpression,
+                stops: [
+                  {value: min, opacity: 0.75},
+                  {value: max, opacity: 0.90}
+                ],
+                legendOptions: {
+                  showLegend: false
+                }
               }
-            }).catch(reject);
+            ]
+          };
+
+          this.#featureLayer.set({
+            renderer: waterGapRenderer,
+            popupTemplate: {
+              title: this.valueExpressionTitle,
+              content: '<b>{expression/water_gap}</b> mm/m3',
+              expressionInfos: [{
+                name: "water_gap",
+                expression: this.valueExpression
+              }]
+            }
           });
+
         };
 
         // UPDATE STATISTICS FIELD //
@@ -320,6 +407,8 @@ class FeatureLayerStats extends HTMLElement {
         reactiveUtils.when(() => this.#view.stationary, () => {
           this.updateStatsRenderer();
         }, {initial: true});
+
+        this._updateRenderer();
 
       });
     });
