@@ -199,7 +199,7 @@ class FeatureLayerStats extends HTMLElement {
     this.#featureLayer.load().then(() => {
 
       /**
-       * TODO: CONFIGURE ALL OTHER LAYER SETTINGS HERE
+       * TODO: CONFIGURE OTHER LAYER SETTINGS HERE
        *       - MIN/MAX SCALE
        *       - FIELDS: CONFIGURE THE DESIRED FIELDS TO BE LOADED BY DEFAULT
        */
