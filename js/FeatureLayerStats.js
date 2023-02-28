@@ -423,7 +423,7 @@ class FeatureLayerStats extends HTMLElement {
           name: "water_gap",
           expression: `
             var val = Round(${ this.valueExpression },${ precision });                  
-            return When(val > 0, val + " m/m2", ${ FeatureLayerStats.NO_DATA_MESSAGE });
+            return When(val > 0, val + " m/m2", "${ FeatureLayerStats.NO_DATA_MESSAGE }");
           `
         }]
       }
