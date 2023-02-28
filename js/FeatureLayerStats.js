@@ -82,7 +82,7 @@ class FeatureLayerStats extends HTMLElement {
     'total_gap': {min: 0.05, max: 250.0, precision: 3}
   };
 
-  colorRampByVariable = {
+  #colorRampByVariable = {
     'total': ['#1f2638', '#2160ff'],
     'domestic': ['#20333a', '#21daff'],
     'irrigation': ['#2f3926', '#72c70c'],
@@ -90,7 +90,7 @@ class FeatureLayerStats extends HTMLElement {
     'industry': ['#322531', '#c25dbd']
   };
 
-  colorsByVariable = {
+  #colorsByVariable = {
     'domestic': ['#20333a', '#20525e', '#207284', '#2193ac', '#21b6d5', '#21daff'],
     'industry': ['#322531', '#4d304c', '#693b67', '#864683', '#a451a0', '#c25dbd'],
     'irrigation': ['#2f3926', '#3c5421', '#486f1c', '#568b17', '#64a912', '#72c70c'],
@@ -215,6 +215,9 @@ class FeatureLayerStats extends HTMLElement {
 
   }
 
+  /**
+   *
+   */
   clearLabels() {
     this.sumLabel.innerHTML = '---';
   }
@@ -346,8 +349,8 @@ class FeatureLayerStats extends HTMLElement {
               type: 'simple-fill',
               color: 'rgba(255,255, 255,0.5)',
               outline: {
-                width: 0.2,
-                color: this.colorRampByVariable[this.#variable][0]
+                width: 0.1,
+                color:  'rgba(127,127, 127,0.3)', // this.#colorRampByVariable[this.#variable][0]
               }
             },
             defaultSymbol: {
@@ -367,12 +370,12 @@ class FeatureLayerStats extends HTMLElement {
                   {
                     label: `${ min.toFixed(precision) }`,
                     value: min,
-                    color: this.colorRampByVariable[this.#variable][0]
+                    color: this.#colorRampByVariable[this.#variable][0]
                   },
                   {
                     label: `${ max.toFixed(precision) }`,
                     value: max,
-                    color: this.colorRampByVariable[this.#variable][1]
+                    color: this.#colorRampByVariable[this.#variable][1]
                   }
                 ]
               },
@@ -394,10 +397,13 @@ class FeatureLayerStats extends HTMLElement {
             renderer: waterGapRenderer,
             popupTemplate: {
               title: this.valueExpressionTitle,
-              content: '<b>{expression/water_gap}</b> m/m<sup>2</sup>',
+              content: '<b>{expression/water_gap}</b>',
               expressionInfos: [{
                 name: "water_gap",
-                expression: this.valueExpression
+                expression: `
+                  var val = Round(${this.valueExpression},${precision});                  
+                  return When(val > 0, val + " m/m2", "no significant amount measured");
+                `
               }]
             }
           });
