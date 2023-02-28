@@ -81,7 +81,7 @@ class FeatureLayerStats extends HTMLElement {
     'livestock_demand': {min: 0.001, max: 9.2, precision: 3},
     'livestock_gap': {min: 0.0001, max: 1.4, precision: 4},
     'total_demand': {min: 0.05, max: 1920.0, precision: 2},
-    'total_gap': {min: 0.05, max: 250.0, precision: 3}
+    'total_gap': {min: 0.05, max: 250.0, precision: 2}
   };
 
   #colorRampByVariable = {
