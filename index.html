@@ -67,8 +67,8 @@
           </calcite-block>
         </calcite-panel>
         
-        <calcite-panel id="huc-test-panel" heading="Water Gap Layers" class="toggle-panel" data-toggle="huc">
-          <calcite-block heading="Options" collapsible open>
+        <calcite-panel id="huc-test-panel" headingXX="Water Gap Layers" class="toggle-panel" data-toggle="huc">
+          <calcite-block heading="Display Options" collapsible open>
             <calcite-label>
               <div>Year</div>
               <calcite-slider id="year-slider" group-separator label-handles label-ticks min="1980" value="1980" max="2019" min-label="1980" max-label="2019" ticks="10" page-step="5" precise snap></calcite-slider>
@@ -91,6 +91,19 @@
               </calcite-segmented-control>
             </calcite-label>
           </calcite-block>
+          <!--<calcite-block heading="Data Options" collapsible open>
+            <calcite-label>
+              <calcite-segmented-control id="stretch-type-option" width="full">
+                <calcite-segmented-control-item value="min-max" checked>Min - Max</calcite-segmented-control-item>
+                <calcite-segmented-control-item value="above">Above</calcite-segmented-control-item>
+                <calcite-segmented-control-item value="std-dev">Std Dev</calcite-segmented-control-item>
+              </calcite-segmented-control>
+            </calcite-label>
+            <calcite-label layout="inline">
+              <div>Number of Standard Deviations</div>
+              <calcite-input-number id="std-dev-input" postfix="miles" placeholder="Offset distance" step="0.5" alignment="end" max="10" min="0.5" value="2.5"></calcite-input-number>
+            </calcite-label>
+          </calcite-block>-->
         </calcite-panel>
       
       </calcite-shell-panel>
@@ -98,6 +111,13 @@
       <!-- CENTER -->
       <div id="center-container" class="content-col content-fill">
         <div id="view-container"></div>
+        <calcite-block heading="Histogram" collapsible open hidden>
+          <div id="histogram-container"></div>
+          <div id="stat-labels">
+            <div id="stat-label-min">min</div>
+            <div id="stat-label-max">max</div>
+          </div>
+        </calcite-block>
       </div>
       
       <!-- SHAREABLE ALERT -->

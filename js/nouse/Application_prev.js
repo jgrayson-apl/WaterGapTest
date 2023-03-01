@@ -167,10 +167,13 @@ class Application extends AppBase {
       const yearSlider = document.getElementById('year-slider');
       const variablesList = document.getElementById('variables-list');
       const statTypeOption = document.getElementById('stat-type-option');
+      const stretchTypeOption = document.getElementById('stretch-type-option');
+      const stdDevInput = document.getElementById('std-dev-input');
 
       const defaultRenderingOptions = {
         defaultVariable: variablesList.value,            //'total',
         defaultStatType: statTypeOption.value,           // 'gap',
+        defaultStretchTypeOption: stretchTypeOption.value // 'min-max'
       };
 
       const waterProvincesLayer = view.map.layers.find(layer => layer.title === 'Water Provinces');
@@ -216,6 +219,20 @@ class Application extends AppBase {
       statTypeOption.addEventListener('calciteSegmentedControlChange', () => {
         allLayerStats.forEach(layerStats => {
           layerStats.statType = statTypeOption.value;
+        });
+      });
+
+      // STRETCH //
+      stretchTypeOption.addEventListener('calciteSegmentedControlChange', () => {
+        allLayerStats.forEach(layerStats => {
+          layerStats.stretch = stretchTypeOption.value;
+        });
+      });
+
+      // STD DEV COUNT //
+      stdDevInput.addEventListener('calciteInputNumberInput', () => {
+        allLayerStats.forEach(layerStats => {
+          layerStats.stdDevCount = Number(stdDevInput.value);
         });
       });
 

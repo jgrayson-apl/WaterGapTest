@@ -123,3 +123,24 @@ calcite-modal [slot="secondary"] calcite-label {
   display: flex;
   flex-direction: column;
 }
+
+/*#histogram-container {
+  height: 120px;
+  width: 100%;
+  border-bottom: solid 2px var(--calcite-ui-border-3);
+}
+
+#stat-labels {
+  width: 100%;
+  padding: 0 0 5px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#stat-label-min,
+#stat-label-max {
+  font-size: 9pt;
+}*/
+

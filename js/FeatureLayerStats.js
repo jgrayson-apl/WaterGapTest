@@ -72,25 +72,39 @@ class FeatureLayerStats extends HTMLElement {
    *
    */
   #variableInfos = {
-    'domestic_demand': {min: 0.01, max: 180.0, precision: 2},
-    'domestic_gap': {min: 0.0001, max: 16.0, precision: 4},
-    'industry_demand': {min: 0.05, max: 520.0, precision: 2},
-    'industry_gap': {min: 0.0001, max: 60.0, precision: 4},
-    'irrigation_demand': {min: 0.05, max: 1900.0, precision: 2},
-    'irrigation_gap': {min: 0.0001, max: 240.0, precision: 4},
-    'livestock_demand': {min: 0.001, max: 9.2, precision: 3},
-    'livestock_gap': {min: 0.0001, max: 1.4, precision: 4},
-    'total_demand': {min: 0.05, max: 1920.0, precision: 2},
-    'total_gap': {min: 0.05, max: 250.0, precision: 2}
+    'domestic_demand': {min: 0.01, precision: 2, stdevCount: 3.0},
+    'domestic_gap': {min: 0.0001, precision: 4, stdevCount: 2.5},
+    'industry_demand': {min: 0.05, precision: 2, stdevCount: 3.0},
+    'industry_gap': {min: 0.0001, precision: 4, stdevCount: 2.5},
+    'irrigation_demand': {min: 0.05, precision: 2, stdevCount: 3.0},
+    'irrigation_gap': {min: 0.0001, precision: 4, stdevCount: 2.5},
+    'livestock_demand': {min: 0.001, precision: 3, stdevCount: 3.0},
+    'livestock_gap': {min: 0.0001, precision: 4, stdevCount: 2.5},
+    'total_demand': {min: 0.05, precision: 2, stdevCount: 3.0},
+    'total_gap': {min: 0.05, precision: 2, stdevCount: 2.5}
   };
 
-  #colorRampByVariable = {
-    'total': ['#1f2638', '#2160ff'],
-    'domestic': ['#20333a', '#21daff'],
-    'irrigation': ['#2f3926', '#72c70c'],
-    'livestock': ['#383726', '#c7b70e'],
-    'industry': ['#322531', '#c25dbd']
+  #variableStats = {
+    'domestic_demand': {"avg": 1.8701870324189545, "count": 1604, "max": 97.62, "min": 0, "stddev": 4.642841466524065, "sum": 2999.780000000003, "variance": 21.55597688327533, "nullcount": 0, "median": 0.3},
+    'domestic_gap': {"avg": 0.03982780548628432, "count": 1604, "max": 5.5494, "min": 0, "stddev": 0.24876309531749016, "sum": 63.88380000000004, "variance": 0.061883077591938694, "nullcount": 0, "median": 0},
+    'industry_demand': {"avg": 6.156770573566092, "count": 1604, "max": 342.38, "min": 0, "stddev": 19.610577150212038, "sum": 9875.460000000012, "variance": 384.5747361644185, "nullcount": 0, "median": 0.37},
+    'industry_gap': {"avg": 0.07875130922693271, "count": 1604, "max": 19.5884, "min": 0, "stddev": 0.7442568523032922, "sum": 126.31710000000007, "variance": 0.5539182622004044, "nullcount": 0, "median": 0},
+    'livestock_demand': {"avg": 0.11942768079800477, "count": 1604, "max": 9.203, "min": 0, "stddev": 0.40304695606141877, "sum": 191.56199999999964, "variance": 0.16244684879037524, "nullcount": 0, "median": 0.009},
+    'livestock_gap': {"avg": 0.0048791147132169616, "count": 1604, "max": 1.3962, "min": 0, "stddev": 0.05065957025926944, "sum": 7.8261000000000065, "variance": 0.002566392058853857, "nullcount": 0, "median": 0},
+    'irrigation_demand': {"avg": 18.62971945137156, "count": 1604, "max": 1431.87, "min": 0, "stddev": 82.51384030818195, "sum": 29882.06999999998, "variance": 6808.533842404153, "nullcount": 0, "median": 0.39},
+    'irrigation_gap': {"avg": 0.7560321072319203, "count": 1604, "max": 187.9277, "min": 0, "stddev": 6.43800977529537, "sum": 1212.6755, "variance": 41.44796986679874, "nullcount": 0, "median": 0},
+    'total_demand': {"avg": 25.204077306733193, "count": 1604, "max": 1436.48, "min": 0, "stddev": 87.88329300969194, "sum": 40427.34000000004, "variance": 7723.473190227369, "nullcount": 0, "median": 2.4850000000000003},
+    'total_gap': {"avg": 0.8781421446384038, "count": 1604, "max": 192.28, "min": 0, "stddev": 6.931584553257501, "sum": 1408.5399999999997, "variance": 48.04686441895799, "nullcount": 0, "median": 0}
+
   };
+
+  /*#colorRampByVariable = {
+   'total': ['#1f2638', '#2160ff'],
+   'domestic': ['#20333a', '#21daff'],
+   'irrigation': ['#2f3926', '#72c70c'],
+   'livestock': ['#383726', '#c7b70e'],
+   'industry': ['#322531', '#c25dbd']
+   };*/
 
   #colorsByVariable = {
     'domestic': ['#20333a', '#20525e', '#207284', '#2193ac', '#21b6d5', '#21daff'],
@@ -110,7 +124,7 @@ class FeatureLayerStats extends HTMLElement {
   set statType(value) {
     this.#statType = value;
     this.updateStatsField();
-    this.updateStatsRenderer();
+    this.updateViz();
   }
 
   #variable;
@@ -121,7 +135,7 @@ class FeatureLayerStats extends HTMLElement {
   set variable(value) {
     this.#variable = value;
     this.updateStatsField();
-    this.updateStatsRenderer();
+    this.updateViz();
   }
 
   #yearMin;
@@ -131,11 +145,10 @@ class FeatureLayerStats extends HTMLElement {
     this.#year = value;
     this.#yearOffset = (this.#year - this.#yearMin);
     this.fieldNameLabel.innerHTML = this.valueExpressionTitle;
-    this.updateStatsRenderer();
+    this.updateViz();
   }
 
   get valueExpressionTitle() {
-    //const fieldLabel = this.#featureLayer.getField(this.#onStatisticField).alias;
     return `${ this.#variable } water ${ this.#statType } in ${ this.#yearMin + this.#yearOffset }`;
   }
 
@@ -162,6 +175,7 @@ class FeatureLayerStats extends HTMLElement {
 
     this.#statType = defaultStatType;
     this.#variable = defaultVariable;
+    this.#onStatisticField = `${ this.#variable }_${ this.#statType }`;
 
     this.#yearMin = this.#year = 1980;
     this.#yearOffset = 0;
@@ -175,15 +189,15 @@ class FeatureLayerStats extends HTMLElement {
     shadowRoot.innerHTML = `
       <style>
         :host {}
-        :host .sum-label{
+        :host .sum-label {
           font-size: 17pt;
           font-weight: 600;
-        }
+        }        
       </style>
       <calcite-block heading="${ this.#featureLayer.title || "Feature Layer Statistics" }" description="all features within the current view" collapsible open>                
         <calcite-label layout="inline-space-between">
           <span>sum of <span class="field-name-label"></span></span><span class="sum-label">---</span>
-        </calcite-label>                        
+        </calcite-label>                                 
       </calcite-block>   
     `;
 
@@ -205,16 +219,14 @@ class FeatureLayerStats extends HTMLElement {
        *       - MIN/MAX SCALE
        *       - FIELDS: CONFIGURE THE DESIRED FIELDS TO BE LOADED BY DEFAULT
        */
-
       this.#featureLayer.set({
         minScale: this.#minScale,
         maxScale: this.#maxScale,
         outFields: this.#statisticsFieldNames
       });
 
+      // INITIALIZE //
       this._initialize();
-
-      this._updateRenderer();
 
     });
 
@@ -235,9 +247,8 @@ class FeatureLayerStats extends HTMLElement {
     require([
       'esri/core/reactiveUtils',
       'esri/core/promiseUtils',
-      'esri/smartMapping/statistics/summaryStatistics',
-      'esri/smartMapping/renderers/color'
-    ], (reactiveUtils, promiseUtils, summaryStatistics, colorRendererCreator) => {
+      'esri/smartMapping/statistics/summaryStatistics'
+    ], (reactiveUtils, promiseUtils, summaryStatistics) => {
 
       const _handleAbortErrors = error => { !promiseUtils.isAbortError(error) && console.error(error); };
 
@@ -251,14 +262,15 @@ class FeatureLayerStats extends HTMLElement {
 
         // NOT SUSPENDED | NOT UPDATING //
         let abortController;
-        this.updateStatsRenderer = () => {
-          // RENDERER CURRENTLY DOESN'T DEPEND ON THE FEATURES BEING LOADED IN THE VIEW //
-          this._updateRenderer();
+        this.updateViz = () => {
           if (!layerView.suspended) {
             reactiveUtils.whenOnce(() => !layerView.updating).then(() => {
               abortController?.abort();
               abortController = new AbortController();
-              this._updateStatsRenderer({signal: abortController.signal}).catch(_handleAbortErrors);
+
+              this._updateRenderer();
+              this._updateSumStats({signal: abortController.signal}).catch(_handleAbortErrors);
+
             }, {initial: true});
           } else {
             this.clearLabels();
@@ -266,23 +278,19 @@ class FeatureLayerStats extends HTMLElement {
         };
 
         /**
-         *
+         * https://developers.arcgis.com/javascript/latest/api-reference/esri-smartMapping-statistics-summaryStatistics.html
          */
-        this._updateStatsRenderer = ({signal}) => {
-          return new Promise((resolve, reject) => {
-            summaryStatistics({
-              view: this.#view,
-              layer: this.#featureLayer,
-              valueExpression: this.valueExpression,
-              useFeaturesInView: true,
-              signal
-            }).then((stats) => {
-              if (!signal.aborted) {
-                //console.info(this.#featureLayer.title, stats);
-                this.sumLabel.innerHTML = this.valueFormatter.format(stats.sum);
-                resolve();
-              }
-            }).catch(reject);
+        this._updateSumStats = ({signal}) => {
+          return summaryStatistics({
+            view: this.#view,
+            layer: this.#featureLayer,
+            valueExpression: this.valueExpression,
+            useFeaturesInView: true,
+            signal
+          }).then((stats) => {
+            if (!signal.aborted) {
+              this.sumLabel.innerHTML = this.valueFormatter.format(stats.sum);
+            }
           });
         };
 
@@ -295,80 +303,61 @@ class FeatureLayerStats extends HTMLElement {
 
         // WHEN STATIONARY //
         reactiveUtils.when(() => this.#view.stationary, () => {
-          this.updateStatsRenderer();
+          this.updateViz();
         }, {initial: true});
-
-        // INITIAL UPDATE //
-        //this._updateRenderer();
 
       });
     });
   }
 
   /**
-   * UPDATE RENDERER
    *
    * @private
    */
   _updateRenderer() {
 
-    /*const colorVV = this.#featureLayer.renderer.visualVariables.find(vv => vv.type === 'color');
-     colorVV.set({
-     valueExpressionTitle: this.valueExpressionTitle,
-     valueExpression: this.valueExpression,
-     legendOptions: {
-     title: this.valueExpressionTitle
-     }/!*,
-     stops: colorVV.stops.map((colorStop, colorStopIdx) => {
-     const stopValue = (stats.min + ((stats.max - stats.min) * (colorStopIdx / colorVV.stops.length)));
-     colorStop.value = stopValue;
-     (colorStopIdx % 2 === 0) && (colorStop.label = stopValue.toFixed(2));
-     return colorStop;
-     })*!/
-     });*/
+    // MIN REPRESENTS THE PREDEFINED CUTOFFS //
+    let {min, precision, stdevCount} = this.#variableInfos[this.#onStatisticField];
+    // USE THE STATISTICAL AVG MAX AND STDDEV //
+    let {avg, max, stddev} = this.#variableStats[this.#onStatisticField];
 
-    /*this.#featureLayer.renderer.visualVariables = [
-     {
-     type: 'color',
-     valueExpressionTitle: this.valueExpressionTitle,
-     valueExpression: this.valueExpression,
-     legendOptions: {
-     title: this.valueExpressionTitle
-     }
-     }
-     ];*/
+    const stdDevValues = {
+      avgMinus: Math.max(avg - (stddev * stdevCount), min),
+      average: avg,
+      avgPlus: Math.min(avg + (stddev * stdevCount), max)
+    };
 
-    /*stops: [
-     {
-     label: `+half stdev - ${ stopValues.avgPlus.toFixed(6) }`,
-     value: stopValues.avgPlus,
-     color: [0, 110, 255]
-     },
-     {
-     label: `average - ${ stopValues.average.toFixed(6) }`,
-     value: stopValues.average,
-     color: [191, 233, 255]
-     },
-     {
-     label: `-half stdev - ${ stopValues.avgMinus.toFixed(6) }`,
-     value: stopValues.avgMinus,
-     color: [0, 110, 255]
-     }
-     ]*/
+    const valueStops = [
+      {
+        label: `-${ stdevCount } stdev: ${ stdDevValues.avgMinus.toFixed(precision) }`,
+        value: stdDevValues.avgMinus,
+        color: this.#colorsByVariable[this.#variable].at(0)
+      },
+      {
+        label: `average: ${ stdDevValues.average.toFixed(6) }`,
+        value: stdDevValues.average,
+        color: this.#colorsByVariable[this.#variable].at(2)
+      },
+      {
+        label: `+${ stdevCount } stdev: ${ stdDevValues.avgPlus.toFixed(precision) }`,
+        value: stdDevValues.avgPlus,
+        color: this.#colorsByVariable[this.#variable].at(-1)
+      }
+    ];
 
-    /*const stopValues = {
-     avgMinus: stats.avg - (stats.stddev * 0.5),
-     average: stats.avg,
-     avgPlus: stats.avg + (stats.stddev * 0.5)
-     };*/
+    // OPACITY STOPS //
+    let opacityStops = [
+      {value: stdDevValues.avgMinus, opacity: 0.70},
+      {value: stdDevValues.avgPlus, opacity: 0.95}
+    ];
 
-    const {min, max, precision} = this.#variableInfos[this.#onStatisticField];
+    //console.info(this.#onStatisticField, JSON.stringify(valueStops), JSON.stringify(opacityStops));
 
     const waterGapRenderer = {
       type: 'simple',
       symbol: {
         type: 'simple-fill',
-        color: 'rgba(255,255, 255,0.5)',
+        color: 'transparent', //'rgba(255,255, 255,0.5)',
         outline: {
           width: 0.1,
           color: 'rgba(127,127, 127,0.3)' // this.#colorRampByVariable[this.#variable][0]
@@ -387,26 +376,12 @@ class FeatureLayerStats extends HTMLElement {
           type: 'color',
           valueExpressionTitle: this.valueExpressionTitle,
           valueExpression: this.valueExpression,
-          stops: [
-            {
-              label: `${ min.toFixed(precision) }`,
-              value: min,
-              color: this.#colorRampByVariable[this.#variable][0]
-            },
-            {
-              label: `${ max.toFixed(precision) }`,
-              value: max,
-              color: this.#colorRampByVariable[this.#variable][1]
-            }
-          ]
+          stops: valueStops
         },
         {
           type: 'opacity',
           valueExpression: this.valueExpression,
-          stops: [
-            {value: min, opacity: 0.70},
-            {value: max, opacity: 0.95}
-          ],
+          stops: opacityStops,
           legendOptions: {
             showLegend: false
           }
@@ -418,14 +393,21 @@ class FeatureLayerStats extends HTMLElement {
       renderer: waterGapRenderer,
       popupTemplate: {
         title: this.valueExpressionTitle,
-        content: '<b>{expression/water_gap}</b>',
-        expressionInfos: [{
-          name: "water_gap",
-          expression: `
-            var val = Round(${ this.valueExpression },${ precision });                  
-            return When(val > 0, val + " m/m2", "${ FeatureLayerStats.NO_DATA_MESSAGE }");
-          `
-        }]
+        content: [
+          {
+            type: 'text',
+            text: '<b>{expression/water_gap_value}</b>'
+          }
+        ],
+        expressionInfos: [
+          {
+            name: "water_gap_value",
+            expression: `
+              var val = Round(${ this.valueExpression },${ precision });                  
+              return When(val > 0, val + " m/m2", "${ FeatureLayerStats.NO_DATA_MESSAGE }");
+            `
+          }
+        ]
       }
     });
 

@@ -1,0 +1,25 @@
+/*const colorVV = this.#featureLayer.renderer.visualVariables.find(vv => vv.type === 'color');
+     colorVV.set({
+     valueExpressionTitle: this.valueExpressionTitle,
+     valueExpression: this.valueExpression,
+     legendOptions: {
+     title: this.valueExpressionTitle
+     }/!*,
+     stops: colorVV.stops.map((colorStop, colorStopIdx) => {
+     const stopValue = (stats.min + ((stats.max - stats.min) * (colorStopIdx / colorVV.stops.length)));
+     colorStop.value = stopValue;
+     (colorStopIdx % 2 === 0) && (colorStop.label = stopValue.toFixed(2));
+     return colorStop;
+     })*!/
+     });*/
+
+    /*this.#featureLayer.renderer.visualVariables = [
+     {
+     type: 'color',
+     valueExpressionTitle: this.valueExpressionTitle,
+     valueExpression: this.valueExpression,
+     legendOptions: {
+     title: this.valueExpressionTitle
+     }
+     }
+     ];*/
