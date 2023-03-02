@@ -93,18 +93,9 @@ class FeatureLayerStats extends HTMLElement {
     'livestock_gap': {"avg": 0.0048791147132169616, "count": 1604, "max": 1.3962, "min": 0, "stddev": 0.05065957025926944, "sum": 7.8261000000000065, "variance": 0.002566392058853857, "nullcount": 0, "median": 0},
     'irrigation_demand': {"avg": 18.62971945137156, "count": 1604, "max": 1431.87, "min": 0, "stddev": 82.51384030818195, "sum": 29882.06999999998, "variance": 6808.533842404153, "nullcount": 0, "median": 0.39},
     'irrigation_gap': {"avg": 0.7560321072319203, "count": 1604, "max": 187.9277, "min": 0, "stddev": 6.43800977529537, "sum": 1212.6755, "variance": 41.44796986679874, "nullcount": 0, "median": 0},
-    'total_demand': {"avg": 25.204077306733193, "count": 1604, "max": 1436.48, "min": 0, "stddev": 87.88329300969194, "sum": 40427.34000000004, "variance": 7723.473190227369, "nullcount": 0, "median": 2.4850000000000003},
+    'total_demand': {"avg": 25.204077306733193, "count": 1604, "max": 1436.48, "min": 0, "stddev": 87.88329300969194, "sum": 40427.34000000004, "variance": 7723.473190227369, "nullcount": 0, "median": 2.485},
     'total_gap': {"avg": 0.8781421446384038, "count": 1604, "max": 192.28, "min": 0, "stddev": 6.931584553257501, "sum": 1408.5399999999997, "variance": 48.04686441895799, "nullcount": 0, "median": 0}
-
   };
-
-  /*#colorRampByVariable = {
-   'total': ['#1f2638', '#2160ff'],
-   'domestic': ['#20333a', '#21daff'],
-   'irrigation': ['#2f3926', '#72c70c'],
-   'livestock': ['#383726', '#c7b70e'],
-   'industry': ['#322531', '#c25dbd']
-   };*/
 
   #colorsByVariable = {
     'domestic': ['#20333a', '#20525e', '#207284', '#2193ac', '#21b6d5', '#21daff'],
@@ -158,6 +149,13 @@ class FeatureLayerStats extends HTMLElement {
 
   /**
    *
+   * @param {HTMLElement|string} container
+   * @param {MapView} view
+   * @param {FeatureLayer} featureLayer
+   * @param {string} defaultVariable
+   * @param {string} defaultStatType
+   * @param {number} minScale
+   * @param {number} maxScale
    */
   constructor({container, view, featureLayer, defaultVariable, defaultStatType, minScale, maxScale}) {
     super();
@@ -227,6 +225,9 @@ class FeatureLayerStats extends HTMLElement {
 
       // INITIALIZE //
       this._initialize();
+
+      // INITIAL RENDERER UPDATE //
+      this._updateRenderer();
 
     });
 
@@ -317,9 +318,9 @@ class FeatureLayerStats extends HTMLElement {
   _updateRenderer() {
 
     // MIN REPRESENTS THE PREDEFINED CUTOFFS //
-    let {min, precision, stdevCount} = this.#variableInfos[this.#onStatisticField];
+    let {precision, stdevCount} = this.#variableInfos[this.#onStatisticField];
     // USE THE STATISTICAL AVG MAX AND STDDEV //
-    let {avg, max, stddev} = this.#variableStats[this.#onStatisticField];
+    let {min, avg, max, stddev} = this.#variableStats[this.#onStatisticField];
 
     const stdDevValues = {
       avgMinus: Math.max(avg - (stddev * stdevCount), min),
@@ -351,8 +352,6 @@ class FeatureLayerStats extends HTMLElement {
       {value: stdDevValues.avgPlus, opacity: 0.95}
     ];
 
-    //console.info(this.#onStatisticField, JSON.stringify(valueStops), JSON.stringify(opacityStops));
-
     const waterGapRenderer = {
       type: 'simple',
       symbol: {
@@ -360,7 +359,7 @@ class FeatureLayerStats extends HTMLElement {
         color: 'transparent', //'rgba(255,255, 255,0.5)',
         outline: {
           width: 0.1,
-          color: 'rgba(127,127, 127,0.3)' // this.#colorRampByVariable[this.#variable][0]
+          color: 'rgba(127,127,127,0.2)' // this.#colorRampByVariable[this.#variable][0]
         }
       },
       defaultSymbol: {
