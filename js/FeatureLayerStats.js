@@ -335,7 +335,7 @@ class FeatureLayerStats extends HTMLElement {
         color: this.#colorsByVariable[this.#variable].at(0)
       },
       {
-        label: `average: ${ stdDevValues.average.toFixed(6) }`,
+        label: `average: ${ stdDevValues.average.toFixed(precision) }`,
         value: stdDevValues.average,
         color: this.#colorsByVariable[this.#variable].at(2)
       },
