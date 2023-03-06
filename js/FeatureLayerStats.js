@@ -72,16 +72,16 @@ class FeatureLayerStats extends HTMLElement {
    *
    */
   #variableInfos = {
-    'domestic_demand': {min: 0.01, precision: 2, stdevCount: 3.0},
-    'domestic_gap': {min: 0.0001, precision: 4, stdevCount: 2.5},
-    'industry_demand': {min: 0.05, precision: 2, stdevCount: 3.0},
-    'industry_gap': {min: 0.0001, precision: 4, stdevCount: 2.5},
-    'irrigation_demand': {min: 0.05, precision: 2, stdevCount: 3.0},
-    'irrigation_gap': {min: 0.0001, precision: 4, stdevCount: 2.5},
-    'livestock_demand': {min: 0.001, precision: 3, stdevCount: 3.0},
-    'livestock_gap': {min: 0.0001, precision: 4, stdevCount: 2.5},
-    'total_demand': {min: 0.05, precision: 2, stdevCount: 3.0},
-    'total_gap': {min: 0.05, precision: 2, stdevCount: 2.5}
+    'domestic_demand': {cutoff: 0.01, precision: 2, stdevCount: 3.0},
+    'domestic_gap': {cutoff: 0.0001, precision: 4, stdevCount: 2.5},
+    'industry_demand': {cutoff: 0.05, precision: 2, stdevCount: 3.0},
+    'industry_gap': {cutoff: 0.0001, precision: 4, stdevCount: 2.5},
+    'irrigation_demand': {cutoff: 0.05, precision: 2, stdevCount: 3.0},
+    'irrigation_gap': {cutoff: 0.0001, precision: 4, stdevCount: 2.5},
+    'livestock_demand': {cutoff: 0.001, precision: 3, stdevCount: 3.0},
+    'livestock_gap': {cutoff: 0.0001, precision: 4, stdevCount: 2.5},
+    'total_demand': {cutoff: 0.05, precision: 2, stdevCount: 3.0},
+    'total_gap': {cutoff: 0.05, precision: 2, stdevCount: 2.5}
   };
 
   #variableStats = {
@@ -140,7 +140,7 @@ class FeatureLayerStats extends HTMLElement {
   }
 
   get valueExpressionTitle() {
-    return `${ this.#variable } water ${ this.#statType } in ${ this.#yearMin + this.#yearOffset }`;
+    return `${ this.#variable } water ${ this.#statType } in ${ this.#yearMin + this.#yearOffset } (m/m2)`;
   }
 
   get valueExpression() {
@@ -317,10 +317,17 @@ class FeatureLayerStats extends HTMLElement {
    */
   _updateRenderer() {
 
+
+
     // MIN REPRESENTS THE PREDEFINED CUTOFFS //
-    let {precision, stdevCount} = this.#variableInfos[this.#onStatisticField];
+    let {cutoff, precision, stdevCount} = this.#variableInfos[this.#onStatisticField];
     // USE THE STATISTICAL AVG MAX AND STDDEV //
     let {min, avg, max, stddev} = this.#variableStats[this.#onStatisticField];
+
+    //
+    // Q: DO WE USE THE MIN FROM THE STATS (ALWAYS ZERO) OR THE PREDETERMINED CUTOFF/MIN?
+    //
+    //min = cutoff;
 
     const stdDevValues = {
       avgMinus: Math.max(avg - (stddev * stdevCount), min),
@@ -330,7 +337,9 @@ class FeatureLayerStats extends HTMLElement {
 
     const valueStops = [
       {
-        label: `-${ stdevCount } stdev: ${ stdDevValues.avgMinus.toFixed(precision) }`,
+        label: (stdDevValues.avgMinus > min)
+          ? `-${ stdevCount } stdev: ${ stdDevValues.avgMinus.toFixed(precision) }`
+          : `min: ${ stdDevValues.avgMinus.toFixed(precision) }`,
         value: stdDevValues.avgMinus,
         color: this.#colorsByVariable[this.#variable].at(0)
       },
@@ -340,7 +349,9 @@ class FeatureLayerStats extends HTMLElement {
         color: this.#colorsByVariable[this.#variable].at(2)
       },
       {
-        label: `+${ stdevCount } stdev: ${ stdDevValues.avgPlus.toFixed(precision) }`,
+        label: (stdDevValues.avgPlus < max)
+          ? `+${ stdevCount } stdev: ${ stdDevValues.avgPlus.toFixed(precision) }`
+          : `max: ${ stdDevValues.avgPlus.toFixed(precision) }`,
         value: stdDevValues.avgPlus,
         color: this.#colorsByVariable[this.#variable].at(-1)
       }
