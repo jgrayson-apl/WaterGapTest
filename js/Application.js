@@ -90,7 +90,14 @@ class Application extends AppBase {
 
           // VIEW AND POPUP //
           view.set({
-            constraints: {snapToZoom: false},
+            constraints: {
+              snapToZoom: false,
+              geometry: {
+                type: 'extent',
+                xmin: -180, xmax: 180,
+                ymin: -60, ymax: 60
+              }
+            },
             highlightOptions: {
               fillOpacity: 0.01,
               haloColor: "crimson"
@@ -170,10 +177,11 @@ class Application extends AppBase {
 
       const defaultRenderingOptions = {
         defaultVariable: variablesList.value,            //'total',
-        defaultStatType: statTypeOption.value,           // 'gap',
+        defaultStatType: statTypeOption.value           // 'gap',
       };
 
       const waterProvincesLayer = view.map.layers.find(layer => layer.title === 'Water Provinces');
+      waterProvincesLayer.outFields = ['*'];
       const waterProvincesStats = new FeatureLayerStats({
         container: 'huc-test-panel',
         view,
@@ -184,6 +192,7 @@ class Application extends AppBase {
       });
 
       const hydroBasinsLevel5Layer = view.map.layers.find(layer => layer.title === 'Hydrobasins Level 5');
+      hydroBasinsLevel5Layer.outFields = ['*'];
       const hydroBasinsLevel5Stats = new FeatureLayerStats({
         container: 'huc-test-panel',
         view,
@@ -194,6 +203,7 @@ class Application extends AppBase {
       });
 
       const hydroBasinsLevel7Layer = view.map.layers.find(layer => layer.title === 'Hydrobasins Level 7');
+      hydroBasinsLevel7Layer.outFields = ['*'];
       const hydroBasinsLevel7Stats = new FeatureLayerStats({
         container: 'huc-test-panel',
         view,
@@ -231,26 +241,55 @@ class Application extends AppBase {
 
       // ABORT CONTROLLER //
       let abortController;
+
+      // GET LOCATION DETAILS //
+      // - DEBOUNCE CALLS
+      // - RESTRICT HITTEST TO OUR ANALYSIS LAYERS //
+      // - IGNORE RESULTS IF SIGNAL IS ABORTED
+      const getLocationDetails = promiseUtils.debounce(({location, signal}) => {
+        return new Promise((resolve, reject) => {
+          view.hitTest(location, {included: allLayerStats}).then((response) => {
+            if (!signal.aborted && response.results.length) {
+              resolve(response.results[0].graphic?.attributes);
+            } else {
+              reject(promiseUtils.createAbortError());
+            }
+          });
+        });
+      });
+
+      // POINTER MOVE //
+      // - ABORT PREVIOUS CALLS VIA ABORTCONTROLLER SIGNAL //
+      // - IGNORE ABORT ERRORS
+      reactiveUtils.on(() => view, 'pointer-move', (event) => {
+        abortController?.abort();
+        abortController = new AbortController();
+        getLocationDetails({location: event, signal: abortController.signal}).then(attributes => {
+          const waterGapValues = attributes[`${ variablesList.value }_${ statTypeOption.value }`];
+          console.info("Hit: ", waterGapValues);
+        }).catch(_handleAbortErrors);
+      });
+
       //
       // DISPLAY POPUP FOR FEATURE(S) AT VIEW CENTER //
       //
-      reactiveUtils.when(() => view.stationary, () => {
-        reactiveUtils.whenOnce(() => !view.updating).then(() => {
-          abortController?.abort();
-          abortController = new AbortController();
-          view.popup.fetchFeatures(view.toScreen(view.center), {signal: abortController.signal}).then((response) => {
-            if (!abortController.signal.aborted) {
-              response.allGraphicsPromise.then((graphics) => {
-                if (graphics?.length) {
-                  view.popup.open({features: graphics});
-                } else {
-                  view.popup.close();
-                }
-              });
-            }
-          }).catch(_handleAbortErrors);
-        }, {initial: true});
-      }, {initial: true});
+      /*reactiveUtils.when(() => view.stationary, () => {
+       reactiveUtils.whenOnce(() => !view.updating).then(() => {
+       abortController?.abort();
+       abortController = new AbortController();
+       view.popup.fetchFeatures(view.toScreen(view.center), {signal: abortController.signal}).then((response) => {
+       if (!abortController.signal.aborted) {
+       response.allGraphicsPromise.then((graphics) => {
+       if (graphics?.length) {
+       view.popup.open({features: graphics});
+       } else {
+       view.popup.close();
+       }
+       });
+       }
+       }).catch(_handleAbortErrors);
+       }, {initial: true});
+       }, {initial: true});*/
 
     });
   }
