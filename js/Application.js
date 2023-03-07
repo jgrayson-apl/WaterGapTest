@@ -265,8 +265,11 @@ class Application extends AppBase {
         abortController?.abort();
         abortController = new AbortController();
         getLocationDetails({location: event, signal: abortController.signal}).then(attributes => {
-          const waterGapValues = attributes[`${ variablesList.value }_${ statTypeOption.value }`];
-          console.info("Hit: ", waterGapValues);
+          if (attributes) {
+            const dataType = `${ variablesList.value }_${ statTypeOption.value }`;
+            const dataValues = attributes[dataType];
+            console.info("Hit: ", attributes.OBJECTID, dataType, dataValues);
+          }
         }).catch(_handleAbortErrors);
       });
 
