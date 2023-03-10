@@ -213,6 +213,7 @@ class Application extends AppBase {
         ...defaultRenderingOptions
       });
 
+      const allLayers = [waterProvincesLayer, hydroBasinsLevel5Layer, hydroBasinsLevel7Layer];
       const allLayerStats = [waterProvincesStats, hydroBasinsLevel5Stats, hydroBasinsLevel7Stats];
 
       // VARIABLE //
@@ -248,7 +249,7 @@ class Application extends AppBase {
       // - IGNORE RESULTS IF SIGNAL IS ABORTED
       const getLocationDetails = promiseUtils.debounce(({location, signal}) => {
         return new Promise((resolve, reject) => {
-          view.hitTest(location, {included: allLayerStats}).then((response) => {
+          view.hitTest(location, {include: allLayers}).then((response) => {
             if (!signal.aborted && response.results.length) {
               resolve(response.results[0].graphic);
             } else {
