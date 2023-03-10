@@ -250,7 +250,7 @@ class Application extends AppBase {
         return new Promise((resolve, reject) => {
           view.hitTest(location, {included: allLayerStats}).then((response) => {
             if (!signal.aborted && response.results.length) {
-              resolve(response.results[0].graphic?.attributes);
+              resolve(response.results[0].graphic);
             } else {
               reject(promiseUtils.createAbortError());
             }
@@ -264,15 +264,27 @@ class Application extends AppBase {
       reactiveUtils.on(() => view, 'pointer-move', (event) => {
         abortController?.abort();
         abortController = new AbortController();
-        getLocationDetails({location: event, signal: abortController.signal}).then(attributes => {
-          if (attributes) {
+        getLocationDetails({location: event, signal: abortController.signal}).then(graphic => {
+          if (graphic) {
+            /*
             const dataType = `${ variablesList.value }_${ statTypeOption.value }`;
-            const dataValues = attributes[dataType];
+            const dataValues = graphic.attributes[dataType];
+            const infos = dataValues.split('|').map((value, valueIdx) => {
+              return `<div>${ 1980 + valueIdx }: ${ Number(value).toFixed(2) }</div>`;
+            }).join('');
+            */
+
+            view.popup.open({
+              //title: `${ variablesList.value } water ${ statTypeOption.value } (m/m2)`,
+              features:[graphic]
+            });
+
             //console.info("Hit: ", attributes.OBJECTID, dataType, dataValues);
+          } else {
+            view.popup.close();
           }
         }).catch(_handleAbortErrors);
       });
-
 
       //
       // DISPLAY POPUP FOR FEATURE(S) AT VIEW CENTER //
