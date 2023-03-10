@@ -267,19 +267,14 @@ class Application extends AppBase {
         getLocationDetails({location: event, signal: abortController.signal}).then(graphic => {
           if (graphic) {
             /*
-            const dataType = `${ variablesList.value }_${ statTypeOption.value }`;
-            const dataValues = graphic.attributes[dataType];
-            const infos = dataValues.split('|').map((value, valueIdx) => {
-              return `<div>${ 1980 + valueIdx }: ${ Number(value).toFixed(2) }</div>`;
-            }).join('');
-            */
-
-            view.popup.open({
-              //title: `${ variablesList.value } water ${ statTypeOption.value } (m/m2)`,
-              features:[graphic]
-            });
-
-            //console.info("Hit: ", attributes.OBJECTID, dataType, dataValues);
+             const dataType = `${ variablesList.value }_${ statTypeOption.value }`;
+             const dataValues = graphic.attributes[dataType];
+             const infos = dataValues.split('|').map((value, valueIdx) => {
+             return `<div>${ 1980 + valueIdx }: ${ Number(value).toFixed(2) }</div>`;
+             }).join('');
+             //console.info("Hit: ", attributes.OBJECTID, dataType, dataValues);
+             */
+            view.popup.open({features: [graphic]});
           } else {
             view.popup.close();
           }
