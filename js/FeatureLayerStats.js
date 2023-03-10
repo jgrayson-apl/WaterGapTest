@@ -317,8 +317,6 @@ class FeatureLayerStats extends HTMLElement {
    */
   _updateRenderer() {
 
-
-
     // MIN REPRESENTS THE PREDEFINED CUTOFFS //
     let {cutoff, precision, stdevCount} = this.#variableInfos[this.#onStatisticField];
     // USE THE STATISTICAL AVG MAX AND STDDEV //
