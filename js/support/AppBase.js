@@ -61,7 +61,7 @@ class AppBase extends AppConfig {
     super();
 
     // ADOBE ANALYTICS //
-    const analyticsUtils = new AdobeAnalyticsUtils({source: this});
+    //const analyticsUtils = new AdobeAnalyticsUtils({source: this});
 
     // APP NAME //
     const pathParts = location.pathname.split('/');

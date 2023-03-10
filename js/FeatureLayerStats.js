@@ -327,7 +327,7 @@ class FeatureLayerStats extends HTMLElement {
     //
     // Q: DO WE USE THE MIN FROM THE STATS (ALWAYS ZERO) OR THE PREDETERMINED CUTOFF/MIN?
     //
-    //min = cutoff;
+    min = cutoff;
 
     const stdDevValues = {
       avgMinus: Math.max(avg - (stddev * stdevCount), min),

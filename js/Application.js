@@ -44,7 +44,7 @@ class Application extends AppBase {
         this.initializeViewShareable({view});
 
         // USER SIGN-IN //
-        this.configUserSignIn();
+        //this.configUserSignIn();
 
         // SET APPLICATION DETAILS //
         this.setApplicationDetails({map, group});
@@ -132,8 +132,8 @@ class Application extends AppBase {
           });
 
           // VIEW LOADING INDICATOR //
-          const viewLoading = new ViewLoading({view: view});
-          view.ui.add(viewLoading, 'bottom-right');
+          // const viewLoading = new ViewLoading({view: view});
+          // view.ui.add(viewLoading, 'bottom-right');
 
           resolve();
         });
@@ -268,7 +268,7 @@ class Application extends AppBase {
           if (attributes) {
             const dataType = `${ variablesList.value }_${ statTypeOption.value }`;
             const dataValues = attributes[dataType];
-            console.info("Hit: ", attributes.OBJECTID, dataType, dataValues);
+            //console.info("Hit: ", attributes.OBJECTID, dataType, dataValues);
           }
         }).catch(_handleAbortErrors);
       });
